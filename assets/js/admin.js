@@ -1,67 +1,64 @@
-$(function(){
-	$('.form-signin').submit(function(e){
-		$('.loader').show();
-		var postdata = $(this).serialize();
-		$.ajax({
-			type: 'POST',
-			url: 'http://localhost:8888/cms/admin/login_try',
-			data: postdata,
-			success: function(data){
-				if(data.success){
-					location.reload();
-				}else{
-					$('.loader').hide();
-					$('.form-signin').addClass('error');
-				}
+"use strict";
+(function($, app, window){
+
+	app.init = function(){
+		/* init tinyMCE */
+		tinymce.init({
+			selector: 'textarea.editor',
+			menubar: false,
+			browser_spellcheck: true,
+			statusbar: false,
+			resize: false,
+			setup: function(ed){
+		      ed.onChange.add(function(ed) {
+		          console.debug('Editor is done: ' + ed.id);
+		      });
 			}
 		});
-		e.preventDefault();
-	});
 
-	/* admin page actions */
-	$('.delete').on('click', deleteClick);
+		/* if no pages on admin page show create Page */
+		if($('.page').length === 0){
+			$('.create-page').show();
+		}
 
-	$('.main').on('click', 'article.page .alert .no', function(){
-		$(this).parent().parent().slideUp();
-
-		$(this).parent().parent().promise().done(function(){
-			$(this).parent().find('.delete').removeClass('inactive').on('click', deleteClick)
-			$(this).remove();
-		})
-	});
-	$('.main').on('click', 'article.page .alert .yes', function(){
-		$(this).find('.loader').show();
-	});
-
-	/* init tinyMCE */
-	tinymce.init({
-		selector: 'textarea.editor',
-		menubar: false,
-		browser_spellcheck: true,
-		statusbar: false,
-		resize: false
-	});
-
-	/* if no pages on admin page show create Page */
-	if($('.page').length === 0){
-		$('.create-page').show();
+		new app.CommunicationLayer();
 	}
-})
 
-var deleteClick = function(){
-		var message = 'Are you sure you want to delete this page?';
-		createAlert($(this).parent().parent(), message, $(this).attr('data-page-id'));
-		$(this).addClass('inactive').unbind('click');
-	},
+	app.CommunicationLayer = function(spec){
+		var self = this,
+			loader = '<img src="assets/img/loader.gif" />';
+		//server stuff
+		self.AddPost = function(data){
+			var data = data.serialize();
+		}
+		return self;
+	};
 
-	createAlert = function(div, message, pageId){
-		var html = '<div class="alert alert-error hidden"><p>';
-			html += message;
-			html += '</p><div class="actions"><span class="btn btn-success yes" data-page-id="'+pageId+'"><img src="../assets/img/loader.gif" class="loader" />Yes</span><span class="btn btn-danger no">No</span></div>';
+	app.PerformBinding = function(app, selector){
+		var $wrapper = $(selector || window.document);
 
-		div.prepend(html);
-		
-		div.promise().done(function(){
-			div.find('.hidden').hide().removeClass('hidden').slideDown();
-		})	
-	}
+		$wrapper
+			.on('click', '.-add', function(e){
+				$('.-create-page').slideToggle();
+			})
+			.on('click', '.-create-btn', function(){
+				if($(this).hasClass('disabled'))
+					return false;
+
+
+			})
+			.on('blur', '.-create-page > input, .-create-page, textarea', function(){
+				var val = $(this).val(),
+					count = 0;
+
+				if($.trim(val) !== ''){
+					count++;
+				}else{
+					$(this).css('border-color', 'red');
+				}
+			})
+
+
+	};
+
+})(jQuery, window.Admin || (window.Admin = {}), window);

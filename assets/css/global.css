@@ -8,6 +8,7 @@ html, body{
 	display: block;
 	padding-left: 180px;
 	box-sizing: border-box;
+	position: relative;
 }
 .container > .sidebar{
 	background: url(../img/sidebarbg.png);
@@ -96,7 +97,11 @@ html, body{
 	float: left;
 }
 .form-signin{
-	margin-top: 300px;
+	position: absolute;
+	height: 280px;
+	top: 50%;
+	left: 50%;
+	margin: -150px 0 0 -140px;
 }
 .form-signin:after{
 	display: block;

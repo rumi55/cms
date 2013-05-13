@@ -6,5 +6,10 @@
         <script src="<?php echo asset_url(); ?>js/bootstrap.min.js"></script>
         <script src="<?php echo asset_url(); ?>js/plugins.js"></script>
         <script src="<?php echo asset_url(); ?>js/admin.js"></script>
+        <script>
+        	$(function(){
+        		Admin.PerformBinding(Admin.init(), ".main");
+        	})
+        </script>
     </body>
 </html>
