@@ -156,9 +156,6 @@ html, body{
 .mce-btn:hover{
 	background: #ccc !important;
 }
-.create-page{
-	display: none;
-}
 .create-page h2 label{
 	font-size: 20px;
 	font-weight: bold;

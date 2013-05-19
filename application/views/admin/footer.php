@@ -8,7 +8,7 @@
         <script src="<?php echo asset_url(); ?>js/admin.js"></script>
         <script>
         	$(function(){
-        		Admin.PerformBinding(Admin.init(), ".main");
+        		Admin.PerformBinding(new Admin.CommunicationLayer(), ".main");
         	})
         </script>
     </body>
