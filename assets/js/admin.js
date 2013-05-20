@@ -2,6 +2,7 @@
 (function($, app, window){
 
 	app.init = function(admin){
+
 		/* init tinyMCE */
 		tinymce.init({
 			selector: 'textarea.editor',
@@ -23,10 +24,7 @@
 		        {title: 'Example 2', inline: 'span', classes: 'example2'},
 		        {title: 'Table styles'},
 		        {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
-		    ],
-		    setup: function(ed){
-		    	ed.on('blur', admin.formValidate);
-		    }
+		    ]
 		});
 		/* if no pages on admin page show create Page */
 		if($('.page').length != 0){
@@ -36,25 +34,51 @@
 
 	app.CommunicationLayer = function(spec){
 		var self = this,
-			loader = '<img src="assets/img/loader.gif" />';
+			loader = '<img src="assets/img/loader.gif" class="loader" />';
 		//server stuff
-		self.AddPost = function(data){
-			var data = data.serialize();
+		self.Post = function(e){
+			var data = $(this).serialize(),
+				action = $(this).attr('action'),
+				method = $(this).attr('method');
+
+			$.ajax({
+				url: action,
+				type: method,
+				data: data,
+				success: self.success,
+				dataType: 'json'
+			});
+			return false;
+		}
+
+		self.success = function(data){
+			if(data.response === true){
+				app.CreateNotifs($('form'), 'success', data.message);
+			}else{
+				app.CreateNotifs($('form'), 'error', data.message);
+			}
 		}
 
 		self.formValidate = function(e){
-			console.log($(this).attr('class'));		
-			if($(this).hasClass('mce-tinymce')){
-				console.log(tinyMCE.get('page-content').getContent());
-			}	
-			// var val = $(this).val(),
-			// 	count = 0;
+			var val = $(this).val(),
+				count = 0;
 
-			// if($.trim(val) !== ''){
-			// 	count++;
-			// }else{
-			// 	$(this).css('border-color', 'red');
-			// }
+			$.each($(this).parent().find('input'), function(i){
+				if($.trim($(this).val()) != ''){
+					count++;
+				}
+			});
+
+			if(count != $(this).parent().find('input').length){
+				
+				$(this).css('border-color', 'red');
+				
+				if(!$('.-create-btn').hasClass('disabled')){
+					$('.-create-btn').addClass('disabled');
+				}
+			}else{
+				$('.-create-btn').removeClass('disabled');
+			}
 		}
 		return self;
 	};
@@ -73,9 +97,39 @@
 
 
 			})
-			.on('blur', '.-create-page > input, .-create-page, textarea', admin.formValidate);
+			.on('blur', '.-create-page > input, .-create-page, textarea', admin.formValidate)
+			.on('keyup', '#page-title', app.buildUrl)
+			.on('submit', '.-form-create', admin.Post);
 
 		app.init(admin);
 	};
+
+	app.CreateNotifs = function(container, type, message){
+
+		container.prepend(
+			'<div class="alert alert-'+type+'">'+message+'</div>'
+		);
+
+		if(type === 'success'){
+			var timer = setTimeout(function(){
+				$('.alert').fadeOut('slow').remove();
+				$(container).slideUp('slow');
+				location.reload();
+				timer = null;
+			}, 2000)
+		}
+	}
+
+	app.buildUrl = function(e){
+		console.log('yeah that makes sense');
+		var val = $(this).val(),
+			url = val.replace(/[^\w\s]/gi, '');
+		url = url.toLowerCase(); // makes it lowercase
+		url = url.replace(/^\s\s*/, '').replace(/\s\s*$/, ''); //trims whitespace
+		url = url.split(' ').join('-'); //joins spaces with dashes
+
+
+		$('.-page-url').val(url);
+	}
 
 })(jQuery, window.Admin || (window.Admin = {}), window);

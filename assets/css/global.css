@@ -119,6 +119,7 @@ html, body{
 }
 .alert{
 	width: 100%;
+	font-size: 13px;
 }
 .alert p{
 	display: inline-block;
@@ -143,6 +144,15 @@ html, body{
 .yes .loader{
 	position: relative;
 	margin-right: 10px;
+	display: none;
+}
+.error{
+	display: inline-block;
+	position: relative;
+	top: -4px;
+	margin-left: 12px;
+	color: #f00;
+	font-size: 13px;
 	display: none;
 }
 
